@@ -6,7 +6,7 @@ Base du projet validée. Tout le monde doit utiliser Java 17, Spring Boot 3.2.4 
 
 ## Configuration Locale
 
-- **URL BDD** : `jdbc:mysql://localhost:3306/hackradar`
+- **URL BDD** : `jdbc:mysql://localhost:3306/hacka`
 - **Port Application** : `8089`
 
 ---
