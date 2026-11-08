@@ -1,10 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
+<html xmlns:th="http://www.thymeleaf.org">
 <body>
+<div th:fragment="flash">
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+</div>
 
+<div th:fragment="actions(h, registered, favorite)" class="d-flex gap-2">
+    <form th:unless="${registered}" th:action="@{/hackathons/{id}/register(id=${h.id})}" method="post">
+        <button class="btn btn-primary">S'inscrire</button>
+    </form>
+    <form th:if="${registered}" th:action="@{/hackathons/{id}/unregister(id=${h.id})}" method="post">
+        <button class="btn btn-outline-danger">Annuler mon inscription</button>
+    </form>
+    <a th:if="${registered}" class="btn btn-outline-primary"
+       th:href="@{/hackathons/{id}/teams(id=${h.id})}">Équipes</a>
+    <form th:action="@{/hackathons/{id}/favorite(id=${h.id})}" method="post">
+        <button class="btn btn-outline-warning" th:text="${favorite} ? '★ Retirer des favoris' : '☆ Ajouter aux favoris'"></button>
+    </form>
+</div>
 </body>
 </html>
