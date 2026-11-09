@@ -1,6 +1,8 @@
 package com.hacka.Hacka.service;
 
+import com.hacka.Hacka.entity.User;
 import com.hacka.Hacka.exception.BusinessException;
+import com.hacka.Hacka.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
