@@ -1,5 +1,7 @@
 package com.hacka.Hacka.dto;
 
+import com.hacka.Hacka.entity.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

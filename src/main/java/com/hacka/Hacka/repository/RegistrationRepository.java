@@ -1,5 +1,7 @@
 package com.hacka.Hacka.repository;
 
+import com.hacka.Hacka.entity.*;
+
 import com.hacka.Hacka.entity.Registration;
 import com.hacka.Hacka.entity.RegistrationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
