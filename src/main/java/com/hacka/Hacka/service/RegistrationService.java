@@ -1,5 +1,9 @@
 package com.hacka.Hacka.service;
 
+import com.hacka.Hacka.repository.*;
+
+import com.hacka.Hacka.entity.*;
+
 import com.hacka.Hacka.entity.Registration;
 import com.hacka.Hacka.entity.RegistrationStatus;
 import com.hacka.Hacka.exception.BusinessException;
