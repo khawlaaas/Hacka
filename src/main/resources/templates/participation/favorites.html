@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Mes Favoris</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container py-4">
+
+<h2>Mes Hackathons Favoris</h2>
+
+<div th:replace="~{participation/fragments :: flash}"></div>
+
+<!-- Si la liste des favoris est vide -->
+<p th:if="${favorites.isEmpty()}" class="text-muted">Vous n'avez aucun hackathon dans vos favoris.</p>
+
+<!-- Liste des favoris -->
+<div th:unless="${favorites.isEmpty()}">
+    <div class="card mb-2" th:each="f : ${favorites}">
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <a th:href="@{/hackathons/{id}(id=${f.hackathon.id})}" th:text="${f.hackathon.title}" class="fw-bold text-decoration-none"></a>
+            <!-- Formulaire pour retirer des favoris directement depuis la liste -->
+            <form th:action="@{/hackathons/{id}/favorite(id=${f.hackathon.id})}" method="post" class="m-0">
+                <button type="submit" class="btn btn-sm btn-outline-warning">★ Retirer</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
