@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Compétences')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<div class="container mt-4" style="max-width:700px">
+    <h2 class="mb-3">Compétences</h2>
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+
+    <form th:action="@{/admin/skills}" method="post" class="d-flex gap-2 mb-4">
+        <input name="name" class="form-control" placeholder="Nouvelle compétence" required>
+        <button class="btn btn-primary">Ajouter</button>
+    </form>
+
+    <table class="table table-striped">
+        <thead><tr><th>#</th><th>Nom</th><th></th></tr></thead>
+        <tbody>
+        <tr th:each="s : ${skills}">
+            <td th:text="${s.id}"></td>
+            <td th:text="${s.name}"></td>
+            <td class="text-end">
+                <form th:action="@{/admin/skills/{id}/delete(id=${s.id})}" method="post"
+                      onsubmit="return confirm('Supprimer cette compétence ?')">
+                    <button class="btn btn-sm btn-outline-danger">Supprimer</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

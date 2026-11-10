@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Hackathons à valider')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mt-4">
+    <h2 class="mb-3">Hackathons proposés</h2>
+
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+    <div class="alert alert-secondary" th:if="${#lists.isEmpty(hackathons)}">
+        Aucun hackathon en attente de validation.
+    </div>
+
+    <table class="table table-striped align-middle" th:unless="${#lists.isEmpty(hackathons)}">
+        <thead>
+        <tr>
+            <th>Titre</th>
+            <th>Début</th>
+            <th>Fin</th>
+            <th>Mode</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="h : ${hackathons}">
+            <td><a th:href="@{/hackathons/{id}(id=${h.id})}" th:text="${h.title}">Titre</a></td>
+            <td th:text="${#temporals.format(h.startDate, 'dd/MM/yyyy HH:mm')}">début</td>
+            <td th:text="${#temporals.format(h.endDate, 'dd/MM/yyyy HH:mm')}">fin</td>
+            <td th:text="${h.mode}">mode</td>
+            <td>
+                <div class="d-flex gap-2 flex-wrap">
+                    <form th:action="@{/admin/hackathons/{id}/validate(id=${h.id})}" method="post">
+                        <button class="btn btn-sm btn-success">Valider</button>
+                    </form>
+                    <form th:action="@{/admin/hackathons/{id}/reject(id=${h.id})}" method="post" class="d-flex gap-1">
+                        <input name="reason" class="form-control form-control-sm" placeholder="Motif du refus">
+                        <button class="btn btn-sm btn-danger">Refuser</button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

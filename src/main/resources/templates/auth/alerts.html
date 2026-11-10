@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Mes alertes')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<div class="container mt-4" style="max-width:800px">
+    <h2 class="mb-3">Mes alertes</h2>
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+
+    <form th:action="@{/profile/alerts}" th:object="${alertDto}" method="post" class="row g-2 mb-4">
+        <div class="col-md-3"><input th:field="*{keywords}" class="form-control" placeholder="Mots-clés"></div>
+        <div class="col-md-2"><input th:field="*{city}" class="form-control" placeholder="Ville"></div>
+        <div class="col-md-2">
+            <select th:field="*{mode}" class="form-select">
+                <option value="">Mode</option>
+                <option th:each="md : ${modes}" th:value="${md}" th:text="${md}"></option>
+            </select></div>
+        <div class="col-md-3">
+            <select th:field="*{themeId}" class="form-select">
+                <option value="">Thème</option>
+                <option th:each="t : ${themes}" th:value="${t.id}" th:text="${t.name}"></option>
+            </select></div>
+        <div class="col-md-2"><button class="btn btn-primary w-100">Créer</button></div>
+        <div class="text-danger small" th:errors="*{keywords}"></div>
+    </form>
+
+    <table class="table">
+        <thead><tr><th>Critères</th><th>État</th><th></th></tr></thead>
+        <tbody>
+        <tr th:each="a : ${alerts}">
+            <td>
+                <span th:if="${a.keywords}" th:text="'Mots-clés : ' + ${a.keywords}"></span>
+                <span th:if="${a.city}" th:text="' | Ville : ' + ${a.city}"></span>
+                <span th:if="${a.mode}" th:text="' | Mode : ' + ${a.mode}"></span>
+                <span th:if="${a.theme}" th:text="' | Thème : ' + ${a.theme.name}"></span>
+            </td>
+            <td><span class="badge" th:classappend="${a.active} ? 'bg-success' : 'bg-secondary'"
+                      th:text="${a.active} ? 'Active' : 'Désactivée'"></span></td>
+            <td>
+                <div class="d-flex gap-1 justify-content-end">
+                    <form th:action="@{/profile/alerts/{id}/toggle(id=${a.id})}" method="post">
+                        <button class="btn btn-sm btn-outline-secondary">Activer / désactiver</button></form>
+                    <form th:action="@{/profile/alerts/{id}/delete(id=${a.id})}" method="post">
+                        <button class="btn btn-sm btn-outline-danger">Supprimer</button></form>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Inscription')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<div class="container mt-5" style="max-width:520px">
+    <h2 class="mb-3">Créer un compte</h2>
+    <div class="alert alert-danger" th:if="${#fields.hasGlobalErrors()}"
+         th:each="e : ${#fields.globalErrors()}" th:text="${e}"></div>
+    <form th:action="@{/register}" th:object="${registerDto}" method="post">
+        <div class="row">
+            <div class="col mb-3"><label class="form-label">Prénom</label>
+                <input th:field="*{firstName}" class="form-control">
+                <div class="text-danger small" th:errors="*{firstName}"></div></div>
+            <div class="col mb-3"><label class="form-label">Nom</label>
+                <input th:field="*{lastName}" class="form-control">
+                <div class="text-danger small" th:errors="*{lastName}"></div></div>
+        </div>
+        <div class="mb-3"><label class="form-label">Email</label>
+            <input th:field="*{email}" type="email" class="form-control">
+            <div class="text-danger small" th:errors="*{email}"></div></div>
+        <div class="mb-3"><label class="form-label">Ville</label>
+            <input th:field="*{city}" class="form-control"></div>
+        <div class="mb-3"><label class="form-label">Mot de passe</label>
+            <input th:field="*{password}" type="password" class="form-control">
+            <div class="text-danger small" th:errors="*{password}"></div></div>
+        <div class="mb-3"><label class="form-label">Confirmer le mot de passe</label>
+            <input th:field="*{confirmPassword}" type="password" class="form-control">
+            <div class="text-danger small" th:errors="*{confirmPassword}"></div></div>
+        <div class="mb-3"><label class="form-label">Je suis</label>
+            <select th:field="*{role}" class="form-select">
+                <option value="PARTICIPANT">Participant</option>
+                <option value="ORGANIZER">Organisateur</option>
+            </select></div>
+        <button class="btn btn-primary w-100">Créer mon compte</button>
+    </form>
+</div>
+</body>
+</html>

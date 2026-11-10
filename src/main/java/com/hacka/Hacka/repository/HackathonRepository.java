@@ -15,6 +15,8 @@ public interface HackathonRepository extends JpaRepository<Hackathon, Long>, Jpa
 
     List<Hackathon> findByCreatedByIdOrderByCreatedAtDesc(Long userId);
 
+    List<Hackathon> findByStatus(HackathonStatus status);
+
     /** File d'attente de validation de l'admin (les plus anciens d'abord). */
     List<Hackathon> findByStatusOrderByCreatedAtAsc(HackathonStatus status);
 

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Dashboard')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mt-4">
+    <h2 class="mb-3">Tableau de bord</h2>
+
+    <div class="d-flex flex-wrap gap-2 mb-4">
+        <a class="btn btn-outline-primary" th:href="@{/admin/users}">Utilisateurs</a>
+        <a class="btn btn-outline-primary" th:href="@{/admin/hackathons}">Hackathons à valider</a>
+        <a class="btn btn-outline-primary" th:href="@{/admin/themes}">Thèmes</a>
+        <a class="btn btn-outline-primary" th:href="@{/admin/skills}">Compétences</a>
+        <a class="btn btn-outline-primary" th:href="@{/admin/reports}">Signalements</a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6 col-lg-3">
+            <h6 class="text-center">Utilisateurs par rôle</h6>
+            <canvas id="roles"></canvas>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <h6 class="text-center">Hackathons par statut</h6>
+            <canvas id="status"></canvas>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <h6 class="text-center">Hackathons par thème</h6>
+            <canvas id="themes"></canvas>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <h6 class="text-center">Inscriptions par statut</h6>
+            <canvas id="regs"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const roles  = /*[[${usersByRole}]]*/ {};
+    const status = /*[[${byStatus}]]*/ {};
+    const themes = /*[[${byTheme}]]*/ {};
+    const regs   = /*[[${byRegistration}]]*/ {};
+
+    const make = (id, type, label, data) => new Chart(document.getElementById(id), {
+        type: type,
+        data: {
+            labels: Object.keys(data),
+            datasets: [{ label: label, data: Object.values(data) }]
+        },
+        options: {
+            scales: type === 'bar' ? { y: { beginAtZero: true, ticks: { precision: 0 } } } : {}
+        }
+    });
+
+    make('roles',  'doughnut', 'Utilisateurs par rôle',   roles);
+    make('status', 'bar',      'Hackathons par statut',   status);
+    make('themes', 'bar',      'Hackathons par thème',    themes);
+    make('regs',   'doughnut', 'Inscriptions par statut', regs);
+    /*]]>*/
+</script>
+</body>
+</html>
