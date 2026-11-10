@@ -5,7 +5,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.nio.file.AccessDeniedException;
 
@@ -24,6 +26,11 @@ public class GlobalExceptionHandler {
     public String handleOther(Exception ex, Model model) {
         model.addAttribute("message", "Une erreur inattendue est survenue.");
         return "error/500";
+    }
+
+    @ExceptionHandler({NoResourceFoundException.class, NoHandlerFoundException.class})
+    public String handleNotFound() {
+        return "error/404";
     }
 
     @ExceptionHandler(AccessDeniedException.class)
