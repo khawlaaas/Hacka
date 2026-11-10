@@ -13,28 +13,23 @@ public class User {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String firstName;
-
-    @Column(nullable = false)
-    private String lastName;
-
-    @Column(nullable = false, unique = true)
-    private String email;
+    @Column(nullable = false, length = 100) private String firstName;
+    @Column(nullable = false, length = 100) private String lastName;
+    @Column(nullable = false, unique = true, length = 150) private String email;
 
     @Column(nullable = false)
     private String password;            // toujours encodé BCrypt
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private Role role = Role.PARTICIPANT;
 
-    private String city;
+    @Column(length = 100) private String city;
 
     @Column(length = 1000)
     private String bio;
 
-    private LocalDateTime createdAt;
+    @Column(nullable = false, updatable = false) private LocalDateTime createdAt;
 
     @Column(nullable = false)
     private boolean enabled = true;     // champ en plus : l'admin peut bloquer un compte

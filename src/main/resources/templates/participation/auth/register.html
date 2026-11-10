@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Inscription')}"></head>
 <body>
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
 <div class="container mt-5" style="max-width:520px">
     <h2 class="mb-3">Créer un compte</h2>
-    <div class="alert alert-danger" th:if="${#fields.hasGlobalErrors()}" th:each="e : ${#fields.globalErrors()}" th:text="${e}"></div>
+    <div class="alert alert-danger" th:if="${#fields.hasGlobalErrors()}"
+         th:each="e : ${#fields.globalErrors()}" th:text="${e}"></div>
     <form th:action="@{/register}" th:object="${registerDto}" method="post">
         <div class="row">
             <div class="col mb-3"><label class="form-label">Prénom</label>
@@ -34,4 +35,5 @@
         <button class="btn btn-primary w-100">Créer mon compte</button>
     </form>
 </div>
-</body></html>
+</body>
+</html>

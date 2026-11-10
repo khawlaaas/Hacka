@@ -17,6 +17,7 @@ public class AdminDashboardController {
         m.addAttribute("usersByRole", service.usersByRole());
         m.addAttribute("byStatus", service.hackathonsByStatus());
         m.addAttribute("byTheme", service.hackathonsByTheme());
+        m.addAttribute("byRegistration", service.registrationsByStatus());
         return "admin/dashboard";
     }
 }

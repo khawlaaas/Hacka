@@ -15,7 +15,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminHackathonService {
     private final HackathonRepository hackathonRepository;
-    private final NotificationService notificationService;   // étape 9
+    private final NotificationService notificationService;
+    private final AlertService alertService;
 
     @Transactional(readOnly = true)
     public List<Hackathon> pending() { return hackathonRepository.findByStatus(HackathonStatus.PROPOSED); }
@@ -24,13 +25,22 @@ public class AdminHackathonService {
     public void validate(Long id) {
         Hackathon h = get(id);
         h.setStatus(HackathonStatus.VALIDATED);
-        notificationService.alertMatchingUsers(h);
+        notificationService.alertMatchingUsers(h);   // correspondance compétences/thèmes
+        alertService.notifyMatchingAlerts(h);        // alertes enregistrées (BF-28)
+        notifyOrganizer(h, "Votre hackathon « " + h.getTitle()
+                + " » a été validé et sera bientôt visible dans le catalogue.");
     }
 
     @Transactional
-    public void reject(Long id) {
+    public void reject(Long id, String reason) {
         Hackathon h = get(id);
         h.setStatus(HackathonStatus.REJECTED);
+        String motif = (reason == null || reason.isBlank()) ? "" : " Motif : " + reason.trim();
+        notifyOrganizer(h, "Votre hackathon « " + h.getTitle() + " » a été refusé." + motif);
+    }
+
+    private void notifyOrganizer(Hackathon h, String message) {
+        if (h.getCreatedBy() != null) notificationService.notify(h.getCreatedBy(), message);
     }
 
     private Hackathon get(Long id) {

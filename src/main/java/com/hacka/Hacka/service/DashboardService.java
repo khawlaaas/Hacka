@@ -3,10 +3,12 @@ package com.hacka.Hacka.service;
 import com.hacka.Hacka.entity.Role;
 import com.hacka.Hacka.entity.Theme;
 import com.hacka.Hacka.repository.HackathonRepository;
+import com.hacka.Hacka.repository.RegistrationRepository;
 import com.hacka.Hacka.repository.UserRepository;
-import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 public class DashboardService {
     private final UserRepository userRepository;
     private final HackathonRepository hackathonRepository;
+    private final RegistrationRepository registrationRepository;
 
     @Transactional(readOnly = true)
     public Map<String, Long> usersByRole() {
@@ -38,5 +41,11 @@ public class DashboardService {
         return hackathonRepository.findAll().stream()
                 .flatMap(h -> h.getThemes().stream())
                 .collect(Collectors.groupingBy(Theme::getName, TreeMap::new, Collectors.counting()));
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Long> registrationsByStatus() {
+        return registrationRepository.findAll().stream()
+                .collect(Collectors.groupingBy(r -> r.getStatus().name(), TreeMap::new, Collectors.counting()));
     }
 }

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Signalements')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<div class="container mt-4">
+    <h2 class="mb-3">Signalements</h2>
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+    <div class="alert alert-secondary" th:if="${#lists.isEmpty(reports)}">Aucun signalement.</div>
+
+    <table class="table table-striped align-middle" th:unless="${#lists.isEmpty(reports)}">
+        <thead><tr><th>Date</th><th>Hackathon</th><th>Auteur</th><th>Motif</th><th>Statut</th><th></th></tr></thead>
+        <tbody>
+        <tr th:each="r : ${reports}">
+            <td th:text="${#temporals.format(r.createdAt, 'dd/MM/yyyy HH:mm')}"></td>
+            <td><a th:href="@{/hackathons/{id}(id=${r.hackathon.id})}" th:text="${r.hackathon.title}"></a></td>
+            <td th:text="${r.user.email}"></td>
+            <td th:text="${r.reason}"></td>
+            <td th:text="${r.status}"></td>
+            <td>
+                <div class="d-flex gap-1" th:if="${r.status.name() == 'OPEN'}">
+                    <form th:action="@{/admin/reports/{id}/resolve(id=${r.id})}" method="post">
+                        <button class="btn btn-sm btn-outline-secondary">Clôturer</button></form>
+                    <form th:action="@{/admin/reports/{id}/cancel-hackathon(id=${r.id})}" method="post"
+                          onsubmit="return confirm('Annuler ce hackathon ?')">
+                        <button class="btn btn-sm btn-outline-danger">Retirer le hackathon</button></form>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

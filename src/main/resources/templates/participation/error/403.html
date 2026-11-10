@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Accès refusé')}"></head>
 <body>
-
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<div class="container mt-5 text-center">
+    <h1 class="display-4">403</h1>
+    <p class="lead">Vous n'avez pas le droit d'accéder à cette page.</p>
+    <a class="btn btn-primary" th:href="@{/}">Retour à l'accueil</a>
+</div>
 </body>
 </html>

@@ -1,19 +1,18 @@
 package com.hacka.Hacka.service;
 
-import com.hacka.Hacka.entity.Hackathon;
-import com.hacka.Hacka.entity.HackathonStatus;
-import com.hacka.Hacka.entity.Notification;
-import com.hacka.Hacka.entity.User;
-import com.hacka.Hacka.repository.HackathonRepository;
-import com.hacka.Hacka.repository.NotificationRepository;
-import com.hacka.Hacka.repository.UserRepository;
-import jakarta.transaction.Transactional;
+
+import com.hacka.Hacka.entity.*;
+import com.hacka.Hacka.exception.BusinessException;
+import com.hacka.Hacka.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -25,38 +24,73 @@ public class NotificationService {
     private final UserRepository userRepository;
     private final HackathonRepository hackathonRepository;
 
-    /** Notification en base + "envoi d'email" simulé dans les logs. */
+    private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+    /** Notification en base + email simulé dans les logs. */
     @Transactional
     public void notify(User u, String message) {
-        if (notificationRepository.existsByUserAndMessage(u, message)) return;   // évite les doublons
+        if (notificationRepository.existsByUserAndMessage(u, message)) return;
         Notification n = new Notification();
-        n.setUser(u); n.setMessage(message);
+        n.setUser(u);
+        n.setMessage(message);
         notificationRepository.save(n);
         log.info("[EMAIL SIMULÉ] à {} : {}", u.getEmail(), message);
     }
 
-    /** Alerte les utilisateurs dont une compétence correspond à un thème du hackathon. */
+    /** Appelé par AdminHackathonService.validate(). */
     @Transactional
     public void alertMatchingUsers(Hackathon h) {
-        Set<String> themes = h.getThemes().stream().map(t -> t.getName().toLowerCase()).collect(Collectors.toSet());
+        notifyMatching(h, "Nouveau hackathon qui correspond à votre profil : " + h.getTitle());
+    }
+
+    private void notifyMatching(Hackathon h, String message) {
+        Set<String> themes = h.getThemes().stream()
+                .map(t -> t.getName().toLowerCase())
+                .collect(Collectors.toSet());
         for (User u : userRepository.findAll()) {
-            boolean match = u.getSkills().stream().anyMatch(s -> themes.contains(s.getName().toLowerCase()));
-            if (match) notify(u, "Nouveau hackathon qui correspond à votre profil : " + h.getTitle());
+            boolean match = u.getSkills().stream()
+                    .anyMatch(s -> themes.contains(s.getName().toLowerCase()));
+            if (match) notify(u, message);
         }
     }
 
-    /** Chaque matin à 8h : rappel des deadlines dans les 48 prochaines heures. */
+    /** Chaque jour à 8h : deadlines dans les 48 prochaines heures. */
     @Scheduled(cron = "0 0 8 * * *")
     @Transactional
     public void deadlineReminders() {
         LocalDateTime now = LocalDateTime.now();
         for (Hackathon h : hackathonRepository.findByStatus(HackathonStatus.REGISTRATION_OPEN)) {
-            if (h.getRegistrationDeadline() != null
-                    && h.getRegistrationDeadline().isAfter(now)
-                    && h.getRegistrationDeadline().isBefore(now.plusHours(48))) {
-                alertMatchingUsers(h);   // à adapter : message "deadline proche"
+            LocalDateTime d = h.getRegistrationDeadline();
+            if (d != null && d.isAfter(now) && d.isBefore(now.plusHours(48))) {
+                notifyMatching(h, "Dernière ligne droite : les inscriptions à « "
+                        + h.getTitle() + " » se terminent le " + d.format(FMT) + ".");
             }
         }
     }
-    // + lecture : list(User), unreadCount(User), markAllRead(User)
+
+    // ----- lecture, utilisée par le controller et le badge -----
+
+    @Transactional(readOnly = true)
+    public List<Notification> listFor(String email) {
+        return notificationRepository.findByUserOrderByCreatedAtDesc(getUser(email));
+    }
+
+    @Transactional(readOnly = true)
+    public long unreadCount(String email) {
+        return userRepository.findByEmail(email)
+                .map(notificationRepository::countByUserAndReadFalse)
+                .orElse(0L);
+    }
+
+    @Transactional
+    public void markAllRead(String email) {
+        for (Notification n : notificationRepository.findByUserOrderByCreatedAtDesc(getUser(email))) {
+            n.setRead(true);
+        }
+    }
+
+    private User getUser(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new BusinessException("Utilisateur introuvable."));
+    }
 }
