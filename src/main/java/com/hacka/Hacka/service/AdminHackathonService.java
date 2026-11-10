@@ -1,8 +1,14 @@
 package com.hacka.Hacka.service;
 
-import jakarta.transaction.Transactional;
+import com.hacka.Hacka.entity.Hackathon;
+import com.hacka.Hacka.entity.HackathonStatus;
+import com.hacka.Hacka.exception.BusinessException;
+import com.hacka.Hacka.repository.HackathonRepository;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 @Service
