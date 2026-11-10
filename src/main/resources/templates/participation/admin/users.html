@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head('Utilisateurs')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<div class="container mt-4">
+    <h2 class="mb-3">Gestion des utilisateurs</h2>
+
+    <div th:replace="~{participation/fragments :: flash}"></div>
+
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead class="table-dark">
+            <tr>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Ville</th>
+                <th>Inscrit le</th>
+                <th>Rôle</th>
+                <th>Statut</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="u : ${users}">
+                <td th:text="${u.firstName + ' ' + u.lastName}"></td>
+                <td th:text="${u.email}"></td>
+                <td th:text="${u.city}"></td>
+                <td th:text="${#temporals.format(u.createdAt, 'dd/MM/yyyy')}"></td>
+
+                <td>
+                    <form th:action="@{/admin/users/{id}/role(id=${u.id})}" method="post"
+                          class="d-flex gap-2">
+                        <select name="role" class="form-select form-select-sm"
+                                th:disabled="${#authentication.name == u.email}">
+                            <option th:each="r : ${roles}" th:value="${r}" th:text="${r}"
+                                    th:selected="${r == u.role}"></option>
+                        </select>
+                        <button class="btn btn-sm btn-outline-primary"
+                                th:disabled="${#authentication.name == u.email}">OK</button>
+                    </form>
+                </td>
+
+                <td>
+                    <span th:if="${u.enabled}" class="badge bg-success">Actif</span>
+                    <span th:unless="${u.enabled}" class="badge bg-danger">Bloqué</span>
+                </td>
+
+                <td>
+                    <form th:action="@{/admin/users/{id}/toggle(id=${u.id})}" method="post">
+                        <button class="btn btn-sm"
+                                th:classappend="${u.enabled} ? 'btn-outline-danger' : 'btn-outline-success'"
+                                th:text="${u.enabled} ? 'Bloquer' : 'Débloquer'"
+                                th:disabled="${#authentication.name == u.email}"></button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Mon profil')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<div class="container mt-4" style="max-width:640px">
+    <h2 class="mb-3">Mon profil</h2>
+    <p class="text-muted" th:text="${user.email}"></p>
+
+    <div th:replace="~{participation/fragments :: flash}"></div>
+
+    <form th:action="@{/profile}" th:object="${profileDto}" method="post">
+        <div class="row">
+            <div class="col mb-3"><label class="form-label">Prénom</label>
+                <input th:field="*{firstName}" class="form-control">
+                <div class="text-danger small" th:errors="*{firstName}"></div></div>
+            <div class="col mb-3"><label class="form-label">Nom</label>
+                <input th:field="*{lastName}" class="form-control">
+                <div class="text-danger small" th:errors="*{lastName}"></div></div>
+        </div>
+        <div class="mb-3"><label class="form-label">Ville</label>
+            <input th:field="*{city}" class="form-control"></div>
+        <div class="mb-3"><label class="form-label">Présentation</label>
+            <textarea th:field="*{bio}" class="form-control" rows="4"></textarea>
+            <div class="text-danger small" th:errors="*{bio}"></div></div>
+
+        <div class="mb-3"><label class="form-label d-block">Compétences</label>
+            <div class="form-check form-check-inline" th:each="s : ${allSkills}">
+                <input class="form-check-input" type="checkbox" name="skillIds"
+                       th:value="${s.id}"
+                       th:checked="${profileDto.skillIds.contains(s.id)}"
+                       th:id="'sk' + ${s.id}">
+                <label class="form-check-label" th:for="'sk' + ${s.id}" th:text="${s.name}"></label>
+            </div>
+        </div>
+
+        <button class="btn btn-primary">Enregistrer</button>
+    </form>
+</div>
+</body></html>
