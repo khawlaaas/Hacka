@@ -13,11 +13,13 @@ import java.security.Principal;
 @Component
 @RequiredArgsConstructor
 public class CurrentUserResolver {
+
     private final UserRepository userRepository;
 
-
-
     public User get(Principal principal) {
+        if (principal == null) {
+            throw new BusinessException("Vous devez être connecté.");
+        }
         return userRepository.findByEmail(principal.getName())
                 .orElseThrow(() -> new BusinessException("Utilisateur introuvable."));
     }

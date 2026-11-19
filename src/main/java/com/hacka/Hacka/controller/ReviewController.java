@@ -17,16 +17,18 @@ import java.security.Principal;
 @Controller
 @RequiredArgsConstructor
 public class ReviewController {
+
     private final ReviewService reviewService;
     private final CurrentUserResolver currentUser;
 
     @PostMapping("/hackathons/{id}/reviews")
-    public String add(@PathVariable Long id, @Valid @ModelAttribute ReviewForm form,
+    public String add(@PathVariable Long id,
+                      @Valid @ModelAttribute("reviewForm") ReviewForm reviewForm,
                       BindingResult result, Principal principal, RedirectAttributes ra) {
         if (result.hasErrors()) {
             ra.addFlashAttribute("error", result.getFieldError().getDefaultMessage());
         } else {
-            reviewService.add(currentUser.get(principal).getId(), id, form);
+            reviewService.add(currentUser.get(principal).getId(), id, reviewForm);
             ra.addFlashAttribute("success", "Merci pour votre avis !");
         }
         return "redirect:/hackathons/" + id;

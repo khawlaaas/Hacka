@@ -19,53 +19,67 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class RegistrationService {
+
     private final RegistrationRepository registrationRepository;
     private final HackathonRepository hackathonRepository;
     private final UserRepository userRepository;
+    private final TeamService teamService;
+    private final BadgeService badgeService;
 
     @Transactional
     public Registration register(Long userId, Long hackathonId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException("Utilisateur introuvable."));
-        Hackathon h = hackathonRepository.findById(hackathonId)
+        Hackathon hackathon = hackathonRepository.findById(hackathonId)
                 .orElseThrow(() -> new BusinessException("Hackathon introuvable."));
 
-        if (h.getStatus() != HackathonStatus.REGISTRATION_OPEN)
+        if (hackathon.getStatus() != HackathonStatus.REGISTRATION_OPEN) {
             throw new BusinessException("Les inscriptions ne sont pas ouvertes pour ce hackathon.");
-        if (h.getRegistrationDeadline() != null
-                && LocalDateTime.now().isAfter(h.getRegistrationDeadline()))
+        }
+        if (hackathon.getRegistrationDeadline() != null
+                && LocalDateTime.now().isAfter(hackathon.getRegistrationDeadline())) {
             throw new BusinessException("La date limite d'inscription est dépassée.");
+        }
 
         Optional<Registration> existing =
                 registrationRepository.findByUserIdAndHackathonId(userId, hackathonId);
-        if (existing.isPresent() && existing.get().getStatus() != RegistrationStatus.CANCELLED)
+        if (existing.isPresent() && existing.get().getStatus() != RegistrationStatus.CANCELLED) {
             throw new BusinessException("Vous êtes déjà inscrit à ce hackathon.");
+        }
 
         long taken = registrationRepository
                 .countByHackathonIdAndStatus(hackathonId, RegistrationStatus.CONFIRMED);
-        if (h.getMaxParticipants() != null && taken >= h.getMaxParticipants())
+        if (hackathon.getMaxParticipants() != null && taken >= hackathon.getMaxParticipants()) {
             throw new BusinessException("Ce hackathon est complet.");
+        }
 
-        // si l'utilisateur avait annulé, on réactive sa ligne (contrainte UNIQUE user+hackathon)
-        Registration r = existing.orElseGet(Registration::new);
-        r.setUser(user);
-        r.setHackathon(h);
-        r.setRegistrationDate(LocalDateTime.now());
-        r.setStatus(RegistrationStatus.CONFIRMED);
-        return registrationRepository.save(r);
+        // Après une annulation, on réactive la même ligne (contrainte UNIQUE user + hackathon).
+        Registration registration = existing.orElseGet(Registration::new);
+        registration.setUser(user);
+        registration.setHackathon(hackathon);
+        registration.setRegistrationDate(LocalDateTime.now());
+        registration.setStatus(RegistrationStatus.CONFIRMED);
+        Registration saved = registrationRepository.save(registration);
+        badgeService.evaluate(userId);
+        return saved;
     }
 
     @Transactional
     public void cancel(Long userId, Long hackathonId) {
-        Registration r = registrationRepository.findByUserIdAndHackathonId(userId, hackathonId)
-                .filter(x -> x.getStatus() != RegistrationStatus.CANCELLED)
+        Registration registration = registrationRepository.findByUserIdAndHackathonId(userId, hackathonId)
+                .filter(r -> r.getStatus() != RegistrationStatus.CANCELLED)
                 .orElseThrow(() -> new BusinessException("Vous n'êtes pas inscrit à ce hackathon."));
-        r.setStatus(RegistrationStatus.CANCELLED);
+        registration.setStatus(RegistrationStatus.CANCELLED);
+
+        // Si le participant était dans une équipe de ce hackathon, il la quitte.
+        teamService.findTeamOf(userId, hackathonId)
+                .ifPresent(team -> teamService.leave(userId, team.getId()));
     }
 
     public boolean isRegistered(Long userId, Long hackathonId) {
         return registrationRepository.findByUserIdAndHackathonId(userId, hackathonId)
-                .map(r -> r.getStatus() == RegistrationStatus.CONFIRMED).orElse(false);
+                .map(r -> r.getStatus() == RegistrationStatus.CONFIRMED)
+                .orElse(false);
     }
 
     public List<Registration> history(Long userId) {

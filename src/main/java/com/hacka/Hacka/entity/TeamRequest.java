@@ -9,6 +9,7 @@ import java.util.*;
 @Table(name = "team_requests")
 @Getter @Setter @NoArgsConstructor
 public class TeamRequest {
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -16,18 +17,22 @@ public class TeamRequest {
     @JoinColumn(name = "team_id")
     private Team team;
 
+    /** Le joueur invité OU le joueur qui candidate. */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id")           // le joueur invité OU candidat
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @Enumerated(EnumType.STRING) @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private RequestType type;
 
-    @Enumerated(EnumType.STRING) @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private RequestStatus status = RequestStatus.PENDING;
 
     @Column(length = 500)
     private String message;
 
+    @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 }

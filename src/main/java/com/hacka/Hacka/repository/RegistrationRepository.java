@@ -12,17 +12,22 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RegistrationRepository extends JpaRepository<Registration, Long> {
+
     Optional<Registration> findByUserIdAndHackathonId(Long userId, Long hackathonId);
+
     long countByHackathonIdAndStatus(Long hackathonId, RegistrationStatus status);
+
+    long countByUserIdAndStatus(Long userId, RegistrationStatus status);
+
     List<Registration> findByUserIdOrderByRegistrationDateDesc(Long userId);
 
-
+    /** Team Finder : inscrits confirmés qui n'ont encore aucune équipe pour ce hackathon. */
     @Query("""
-        select r.user from Registration r
-        where r.hackathon.id = :hid and r.status = :status
-          and not exists (select 1 from TeamMember tm
-                          where tm.user = r.user and tm.team.hackathon.id = :hid)
-        """)
+            select r.user from Registration r
+            where r.hackathon.id = :hid and r.status = :status
+              and not exists (select 1 from TeamMember tm
+                              where tm.user = r.user and tm.team.hackathon.id = :hid)
+            """)
     List<User> findUnteamedParticipants(@Param("hid") Long hackathonId,
                                         @Param("status") RegistrationStatus status);
 }

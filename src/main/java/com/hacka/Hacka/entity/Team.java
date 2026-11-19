@@ -9,6 +9,7 @@ import java.util.*;
 @Table(name = "teams")
 @Getter @Setter @NoArgsConstructor
 public class Team {
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -18,11 +19,13 @@ public class Team {
     @Column(length = 1000)
     private String description;
 
+    /** Profils recherchés, ex : "Design, IA". */
     private String lookingForSkills;
 
     @Column(nullable = false)
     private int maxSize = 4;
 
+    @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -35,5 +38,7 @@ public class Team {
     @OneToMany(mappedBy = "team", cascade = CascadeType.REMOVE)
     private List<TeamRequest> requests = new ArrayList<>();
 
-    public boolean isFull() { return members.size() >= maxSize; }
+    public boolean isFull() {
+        return members.size() >= maxSize;
+    }
 }
