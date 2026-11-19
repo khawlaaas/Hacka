@@ -10,6 +10,7 @@ import java.util.*;
         uniqueConstraints = @UniqueConstraint(columnNames = {"team_id", "user_id"}))
 @Getter @Setter @NoArgsConstructor
 public class TeamMember {
+
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -25,9 +26,12 @@ public class TeamMember {
     @Column(nullable = false)
     private TeamRole role = TeamRole.MEMBER;
 
+    @Column(nullable = false)
     private LocalDateTime joinedAt = LocalDateTime.now();
 
     public TeamMember(Team team, User user, TeamRole role) {
-        this.team = team; this.user = user; this.role = role;
+        this.team = team;
+        this.user = user;
+        this.role = role;
     }
 }

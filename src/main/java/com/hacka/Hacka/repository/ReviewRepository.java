@@ -8,8 +8,12 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
+
     boolean existsByUserIdAndHackathonId(Long userId, Long hackathonId);
+
     List<Review> findByHackathonIdOrderByCreatedAtDesc(Long hackathonId);
+
+    long countByUserId(Long userId);
 
     @Query("select avg(r.rating) from Review r where r.hackathon.id = :hid")
     Double averageRating(@Param("hid") Long hackathonId);
