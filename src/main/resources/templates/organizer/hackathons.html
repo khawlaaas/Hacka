@@ -8,7 +8,7 @@
 </head>
 <body class="container py-4">
 
-<div th:replace="~{fragments/catalog :: nav}"></div>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
 <div th:replace="~{participation/fragments :: flash}"></div>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -16,6 +16,7 @@
     <div class="d-flex gap-2">
         <a th:href="@{/organizer/organizations}" class="btn btn-outline-secondary">Mes organisations</a>
         <a th:href="@{/organizer/hackathons/new}" class="btn btn-primary">+ Publier un hackathon</a>
+        <a th:href="@{/organizer/import}" class="btn btn-outline-primary">✨ Importer une annonce (IA)</a>
     </div>
 </div>
 
