@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /** Les thèmes sont gérés par l'admin (module A appelle ces méthodes). */
 @Service
@@ -26,6 +29,18 @@ public class ThemeService {
         String n = name.trim();
         if (themeRepository.existsByNameIgnoreCase(n)) throw new BusinessException("Ce thème existe déjà.");
         return themeRepository.save(new Theme(n));
+    }
+    /** Identifiants des thèmes dont le nom correspond (sans tenir compte de la casse) : import IA. */
+    @Transactional(readOnly = true)
+    public Set<Long> idsByNames(Collection<String> names) {
+        Set<Long> ids = new HashSet<>();
+        if (names == null) return ids;
+        for (Theme t : findAll()) {
+            for (String n : names) {
+                if (n != null && n.trim().equalsIgnoreCase(t.getName())) ids.add(t.getId());
+            }
+        }
+        return ids;
     }
 
     @Transactional

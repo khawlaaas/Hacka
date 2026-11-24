@@ -8,8 +8,11 @@
 </head>
 <body class="container py-4" style="max-width: 860px">
 
-<div th:replace="~{fragments/catalog :: nav}"></div>
-
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<div class="alert alert-info" th:if="${importedByAi}">
+    <strong>Formulaire pré-rempli par l'IA.</strong> Vérifiez chaque champ (dates, lieu, thèmes)
+    et choisissez l'organisation avant de soumettre.
+</div>
 <h2 class="mb-3" th:text="${editId != null} ? 'Modifier le hackathon' : 'Publier un hackathon'"></h2>
 <p class="text-muted" th:if="${editId == null}">
     Votre hackathon sera créé au statut « Proposé » et visible dans le catalogue après validation par un administrateur.
